@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ACE – Capacitación</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <style>
+    /* ── Capacitación específico ── */
+    .progress-banner {
+        background: linear-gradient(90deg, var(--ace-navy), #1e4080);
+        border-radius: 12px; padding: 20px 28px; color: #fff;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .module-list { display: flex; flex-direction: column; gap: 10px; }
+    .module-item {
+        background: #fff; border-radius: 10px; padding: 14px 18px;
+        border: 1.5px solid #e5e7eb; cursor: pointer;
+        transition: border-color .2s, box-shadow .2s;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .module-item:hover { border-color: var(--ace-cyan); box-shadow: 0 2px 8px rgba(0,180,216,.15); }
+    .module-item.active-module { border-color: var(--ace-cyan); background: #f0fbff; }
+    .module-item.locked { opacity: .55; cursor: not-allowed; }
+    .module-bar { height: 4px; border-radius: 2px; background: #e5e7eb; margin-top: 6px; }
+    .module-bar-fill { height: 4px; border-radius: 2px; }
+    .video-panel {
+        background: #1a2035; border-radius: 12px; overflow: hidden;
+    }
+    .video-screen {
+        background: #0d1117; height: 280px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        position: relative; color: #fff;
+    }
+    .play-btn {
+        width: 60px; height: 60px; border-radius: 50%;
+        background: var(--ace-cyan); border: none; color: #fff;
+        font-size: 1.4rem; display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: transform .2s;
+    }
+    .play-btn:hover { transform: scale(1.1); }
+    .lesson-row {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 0; border-bottom: 1px solid #f0f0f0;
+    }
+    .lesson-row:last-child { border-bottom: none; }
+    .lesson-num {
+        width: 28px; height: 28px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: .75rem; font-weight: 700; flex-shrink: 0;
+    }
+    .lesson-num.done  { background: #22c55e; color: #fff; }
+    .lesson-num.curr  { background: var(--ace-cyan); color: #fff; }
+    .lesson-num.pend  { background: #e5e7eb; color: #888; }
+    .badge-encurso    { background: var(--ace-cyan); color: #fff; font-size: .7rem; font-weight:700; padding: 2px 8px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<nav id="sidebar">
+    <div class="sidebar-logo"><img src="images/logo ace.jpeg" alt="ACE" class="sidebar-logo-img"/></div>
+    <ul class="nav flex-column sidebar-nav mt-2">
+    <li class="nav-item"><a class="nav-link" href="../index.html"><i class="bi bi-house-door"></i> Inicio</a></li>
+    <li class="nav-item"><a class="nav-link" href="capacitacion.html"><i class="bi bi-journal-bookmark"></i> Capacitación</a></li>
+    <li class="nav-item"><a class="nav-link" href="simulacion3d.html"><i class="bi bi-box-seam"></i> Simulación 3D</a></li>
+    <li class="nav-item"><a class="nav-link" href="simulacion2d.html"><i class="bi bi-display"></i> Simulación 2D</a></li>
+    <li class="nav-item"><a class="nav-link" href="clasificacion.html"><i class="bi bi-tags"></i> Clasificación de paquetes</a></li>
+    <li class="nav-item"><a class="nav-link" href="escaneo.html"><i class="bi bi-upc-scan"></i> Escaneo y etiquetado</a></li>
+    <li class="nav-item"><a class="nav-link" href="rutas.html"><i class="bi bi-arrow-left-right"></i> Rutas de banda</a></li>
+    <li class="nav-item"><a class="nav-link" href="kpis.html"><i class="bi bi-bar-chart-line"></i> KPIs y rendimiento</a></li>
+    <li class="nav-item"><a class="nav-link" href="reportes.html"><i class="bi bi-file-earmark-text"></i> Reportes</a></li>
+    <li class="nav-item"><a class="nav-link" href="configuracion.html"><i class="bi bi-gear"></i> Configuración</a></li>
+    </ul>
+</nav>
+
+<header id="topbar" class="d-flex align-items-center justify-content-between">
+    <div>
+    <div class="topbar-title">Entrenamiento de Operarios de Almacén</div>
+    <div class="topbar-sub">Sistema de capacitación interactiva ACE Logístico</div>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+    <input class="search-box" type="text" placeholder="🔍  Buscar módulos…"/>
+    <button class="btn btn-light position-relative">
+        <i class="bi bi-bell fs-5"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:.6rem">3</span>
+    </button>
+    <div class="d-flex align-items-center gap-2">
+        <div><div style="font-size:.85rem;font-weight:600">Carlos Méndez</div><div style="font-size:.72rem;color:#888">Nivel 3</div></div>
+        <div class="avatar-circle">CM</div>
+    </div>
+    </div>
+</header>
+
+<main id="main">
+    <!-- Sub-header -->
+    <div class="sub-header">
+    <div class="sub-header-left">
+        <a href="../index.html" class="btn-back"><i class="bi bi-arrow-left"></i> Volver al inicio</a>
+        <div>
+        <h2>Capacitación</h2>
+        <p>Módulos de entrenamiento interactivos para operarios ACE</p>
+        </div>
+    </div>
+    <span class="badge-level"><i class="bi bi-check-circle me-1"></i>12 módulos completados</span>
+    </div>
+
+    <div class="page-body">
+    <!-- Progress banner -->
+    <div class="progress-banner mb-4">
+        <div>
+        <div class="fw-bold fs-6">Tu progreso de capacitación</div>
+        <div style="font-size:.82rem;opacity:.8">Carolina Dominguez,Eyvar Perez,Adolfo Hernandez – Nivel 3: Escáner Certificado</div>
+        <div style="font-size:.78rem;opacity:.7;margin-top:4px">4 de 6 módulos activos</div>
+        <div class="progress mt-2" style="width:300px;background:rgba(255,255,255,.2)">
+            <div class="progress-bar" style="width:68%;background:#fff"></div>
+        </div>
+        <div style="font-size:.75rem;opacity:.7;margin-top:4px">2 módulos restantes</div>
+        </div>
+        <div class="text-end">
+        <div style="font-size:2.5rem;font-weight:900;line-height:1">68%</div>
+        <div style="font-size:.8rem;opacity:.8">completado</div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left: module list -->
+        <div class="col-lg-5">
+        <h6 class="fw-bold mb-3">Módulos de capacitación</h6>
+        <div class="module-list" id="moduleList">
+
+            <div class="module-item" onclick="selectModule(this,'Introducción al almacén ACE','Lección 5: Sistemas de bandas transportadoras')">
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <span style="background:#e8ecf5;border-radius:6px;padding:4px 8px;font-size:.75rem"><i class="bi bi-house-door text-primary"></i></span>
+                    <span style="font-size:.88rem;font-weight:600">Introducción al almacén ACE</span>
+                </div>
+                <i class="bi bi-check-circle-fill text-success"></i>
+                </div>
+                <div style="font-size:.75rem;color:#888;margin-top:4px"><i class="bi bi-clock me-1"></i>25 min &nbsp;·&nbsp; 5 lecciones</div>
+                <div class="module-bar"><div class="module-bar-fill" style="width:100%;background:#22c55e"></div></div>
+            </div>
+            </div>
+
+            <div class="module-item" onclick="selectModule(this,'Escaneo y etiquetado de paquetes','Lección 3: Códigos QR avanzados')">
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <span style="background:#e8f4fd;border-radius:6px;padding:4px 8px;font-size:.75rem"><i class="bi bi-upc-scan" style="color:#1a7abf"></i></span>
+                    <span style="font-size:.88rem;font-weight:600">Escaneo y etiquetado de paquetes</span>
+                </div>
+                <i class="bi bi-check-circle-fill text-success"></i>
+                </div>
+                <div style="font-size:.75rem;color:#888;margin-top:4px"><i class="bi bi-clock me-1"></i>40 min &nbsp;·&nbsp; 8 lecciones</div>
+                <div class="module-bar"><div class="module-bar-fill" style="width:100%;background:#22c55e"></div></div>
+            </div>
+            </div>
+
+            <div class="module-item active-module" id="modActivo" onclick="selectModule(this,'Clasificación en banda transportadora','Lección 4: Manejo de paquetes frágiles')">
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <span style="background:var(--ace-light);border-radius:6px;padding:4px 8px;font-size:.75rem"><i class="bi bi-arrow-left-right" style="color:var(--ace-cyan)"></i></span>
+                    <span style="font-size:.88rem;font-weight:600">Clasificación en banda transportadora</span>
+                </div>
+                <i class="bi bi-chevron-right text-muted"></i>
+                </div>
+                <div style="font-size:.75rem;color:#888;margin-top:4px"><i class="bi bi-clock me-1"></i>35 min &nbsp;·&nbsp; 7 lecciones</div>
+                <div class="module-bar"><div class="module-bar-fill" style="width:45%;background:var(--ace-cyan)"></div></div>
+            </div>
+            </div>
+
+            <div class="module-item" onclick="selectModule(this,'Rutas y zonas de distribución','Lección 1: Introducción a rutas')">
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <span style="background:#f5f0ff;border-radius:6px;padding:4px 8px;font-size:.75rem"><i class="bi bi-signpost-split" style="color:#7c3aed"></i></span>
+                    <span style="font-size:.88rem;font-weight:600">Rutas y zonas de distribución</span>
+                </div>
+                <i class="bi bi-chevron-right text-muted"></i>
+                </div>
+                <div style="font-size:.75rem;color:#888;margin-top:4px"><i class="bi bi-clock me-1"></i>30 min &nbsp;·&nbsp; 6 lecciones</div>
+                <div class="module-bar"><div class="module-bar-fill" style="width:20%;background:#7c3aed"></div></div>
+            </div>
+            </div>
+
+            <div class="module-item" onclick="selectModule(this,'KPIs y métricas de rendimiento','Lección 1: Introducción a KPIs')">
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <span style="background:#fff7e6;border-radius:6px;padding:4px 8px;font-size:.75rem"><i class="bi bi-bar-chart-line" style="color:#d97706"></i></span>
+                    <span style="font-size:.88rem;font-weight:600">KPIs y métricas de rendimiento</span>
+                </div>
+                <i class="bi bi-chevron-right text-muted"></i>
+                </div>
+                <div style="font-size:.75rem;color:#888;margin-top:4px"><i class="bi bi-clock me-1"></i>20 min &nbsp;·&nbsp; 4 lecciones</div>
+                <div class="module-bar"><div class="module-bar-fill" style="width:0%;background:#d97706"></div></div>
+            </div>
+            </div>
+
+            <div class="module-item locked">
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <span style="background:#f0f0f0;border-radius:6px;padding:4px 8px;font-size:.75rem"><i class="bi bi-controller text-muted"></i></span>
+                    <span style="font-size:.88rem;font-weight:600;color:#999">Simulación avanzada 3D <i class="bi bi-lock-fill" style="font-size:.7rem"></i></span>
+                </div>
+                </div>
+                <div style="font-size:.75rem;color:#bbb;margin-top:4px"><i class="bi bi-clock me-1"></i>60 min &nbsp;·&nbsp; 10 lecciones</div>
+                <div class="module-bar"><div class="module-bar-fill" style="width:0%;background:#ccc"></div></div>
+            </div>
+            </div>
+
+        </div>
+        </div>
+
+        <!-- Right: video + lessons -->
+        <div class="col-lg-7">
+        <div class="video-panel mb-3">
+            <div class="video-screen">
+            <button class="play-btn mb-3"><i class="bi bi-play-fill"></i></button>
+            <div style="font-size:.82rem;opacity:.6" id="videoLabel">Lección 4: Manejo de paquetes frágiles</div>
+            <div style="position:absolute;top:14px;right:14px;font-size:.75rem;opacity:.6">68% completado</div>
+            <div style="position:absolute;bottom:14px;right:14px;font-size:.72rem;opacity:.5">0:00 / 7 min</div>
+            </div>
+            <div class="p-3 text-white">
+            <h5 class="fw-bold mb-1" id="videoTitle">Clasificación en banda transportadora</h5>
+            <p style="font-size:.82rem;opacity:.7;margin:0">Técnicas de clasificación rápida y precisa según destino, peso y prioridad.</p>
+            </div>
+        </div>
+
+        <!-- Lessons list -->
+        <div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+            <div class="d-flex justify-content-between mb-3">
+            <span class="fw-bold">Contenido del módulo</span>
+            <span style="font-size:.8rem;color:#888">3/7 completadas</span>
+            </div>
+            <div class="lesson-row">
+            <div class="d-flex align-items-center gap-3">
+                <span class="lesson-num done"><i class="bi bi-check"></i></span>
+                <span style="font-size:.88rem">Tipos de paquetes y materiales</span>
+            </div>
+            <span style="font-size:.78rem;color:#888"><i class="bi bi-star-fill text-warning me-1"></i>5 min</span>
+            </div>
+            <div class="lesson-row">
+            <div class="d-flex align-items-center gap-3">
+                <span class="lesson-num done"><i class="bi bi-check"></i></span>
+                <span style="font-size:.88rem">Lectura de códigos de destino</span>
+            </div>
+            <span style="font-size:.78rem;color:#888"><i class="bi bi-star-fill text-warning me-1"></i>6 min</span>
+            </div>
+            <div class="lesson-row">
+            <div class="d-flex align-items-center gap-3">
+                <span class="lesson-num done"><i class="bi bi-check"></i></span>
+                <span style="font-size:.88rem">Técnicas de clasificación rápida</span>
+            </div>
+            <span style="font-size:.78rem;color:#888"><i class="bi bi-star-fill text-warning me-1"></i>8 min</span>
+            </div>
+            <div class="lesson-row" style="background:#f0fbff;border-radius:8px;padding:10px 8px;margin:0 -8px">
+            <div class="d-flex align-items-center gap-3">
+                <span class="lesson-num curr">4</span>
+                <span style="font-size:.88rem;font-weight:600">Manejo de paquetes frágiles</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span style="font-size:.78rem;color:#888">7 min</span>
+                <span class="badge-encurso">En curso</span>
+            </div>
+            </div>
+            <div class="lesson-row">
+            <div class="d-flex align-items-center gap-3">
+                <span class="lesson-num pend">5</span>
+                <span style="font-size:.88rem;color:#888">Resolución de errores comunes</span>
+            </div>
+            <span style="font-size:.78rem;color:#bbb">6 min</span>
+            </div>
+            <div class="lesson-row">
+            <div class="d-flex align-items-center gap-3">
+                <span class="lesson-num pend">6</span>
+                <span style="font-size:.88rem;color:#888">Optimización de velocidad</span>
+            </div>
+            <span style="font-size:.78rem;color:#bbb">5 min</span>
+            </div>
+            <div class="lesson-row">
+            <div class="d-flex align-items-center gap-3">
+                <span class="lesson-num pend">7</span>
+                <span style="font-size:.88rem;color:#888">Evaluación práctica</span>
+            </div>
+            <span style="font-size:.78rem;color:#bbb">9 min</span>
+            </div>
+            <a href="simulacion3d.html" class="btn-primary-ace w-100 mt-3 justify-content-center">
+            <i class="bi bi-play-fill"></i> Continuar con Simulación 3D
+            </a>
+        </div>
+        </div>
+    </div>
+    </div>
+</main>
+
+<script src="../js/bootstrap.bundle.min.js"></script>
+<script src="../js/main.js"></script>
+<script>
+function selectModule(el, title, lesson) {
+    document.querySelectorAll('.module-item:not(.locked)').forEach(i => i.classList.remove('active-module'));
+    el.classList.add('active-module');
+    document.getElementById('videoTitle').textContent = title;
+    document.getElementById('videoLabel').textContent = lesson;
+}
+</script>
+</body>
+</html>
