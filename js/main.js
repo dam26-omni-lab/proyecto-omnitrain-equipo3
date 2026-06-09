@@ -1,6 +1,11 @@
+const currentPage = window.location.pathname.split('/').pop();
+
 document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => {
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    const linkPage = link.getAttribute('href').split('/').pop();
+
+    if (linkPage === currentPage) {
     link.classList.add('active');
-});
+    } else {
+    link.classList.remove('active');
+    }
 });
