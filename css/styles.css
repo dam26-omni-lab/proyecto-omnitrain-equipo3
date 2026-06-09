@@ -230,3 +230,15 @@ body { background: #f0f4f8; font-family: 'Segoe UI', sans-serif; margin: 0; }
 }
 .construction-card h3 { color: var(--ace-navy); font-weight: 800; }
 .construction-card p  { color: #888; font-size: .95rem; }
+
+/* ── SIDEBAR NAV ── */
+.sidebar-nav .nav-link.active {
+  background: var(--ace-cyan);   /* #00b4d8 */
+    color: #fff;
+    border-left-color: #fff;
+    font-weight: 600;
+}
+
+:root {
+    --ace-cyan: #00b4d8;
+}
