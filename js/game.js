@@ -10,44 +10,27 @@ class EscenaPrincipal extends Phaser.Scene {
 
     create() {
 
-        // Agregar imagen centrada
-        const imagen = this.add.image(400, 250, 'prueba');
+        const imagen = this.add.image(400, 200, 'prueba');
 
-        // Reducir tamaño
         imagen.setScale(0.3);
 
-        // Efecto de movimiento continuo
-        this.tweens.add({
-            targets: imagen,
-            y: 280,
-            duration: 1500,
-            ease: 'Sine.easeInOut',
-            yoyo: true,
-            repeat: -1
-        });
-
-        // Texto
         const texto = this.add.text(
             400,
-            500,
+            450,
             '¡Phaser funciona!',
             {
-                fontSize: '40px',
+                fontSize: '36px',
                 fontFamily: 'Arial',
                 color: '#00ff00',
-                fontStyle: 'bold',
-                stroke: '#000000',
-                strokeThickness: 6
+                fontStyle: 'bold'
             }
         );
 
-        // Centrar el texto
         texto.setOrigin(0.5);
-
-        // Efecto de zoom continuo
+        
         this.tweens.add({
             targets: texto,
-            scale: 1.2,
+            alpha: 0.5,
             duration: 1000,
             yoyo: true,
             repeat: -1
