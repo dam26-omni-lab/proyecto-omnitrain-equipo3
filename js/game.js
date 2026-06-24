@@ -5,7 +5,7 @@ class EscenaPrincipal extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('prueba', '../images/prueba.jpeg');
+        this.load.image('prueba', '../../images/prueba.jpeg');
     }
 
     create() {
