@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ACE – Simulación 3D</title>
+  <link rel="stylesheet" href="../../css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../css/styles.css">
+  <link rel="stylesheet" href="../../css/bootstrap-icons.min.css">
+  <style>
+    .stat-pill {
+      background: #fff; border-radius: 10px; padding: 14px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06); border-left: 4px solid var(--ace-cyan);
+    }
+    .stat-pill .val { font-size: 1.6rem; font-weight: 800; color: var(--ace-navy); }
+    .stat-pill .lbl { font-size: .75rem; color: #888; }
+    .belt-2d {
+      background: #0d1117; border-radius: 12px; padding: 20px;
+    }
+    .belt-track {
+      height: 60px; background: #1a2035; border-radius: 8px;
+      border: 1px solid #2a3a5c; display: flex; align-items: center;
+      padding: 0 12px; gap: 12px; margin-bottom: 16px;
+    }
+    .pkg-2d {
+      width: 44px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .zone-btn {
+      background: #fff; border: 1.5px solid #e5e7eb; border-radius: 10px;
+      padding: 18px 12px; text-align: center; cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .zone-btn:hover { border-color: var(--ace-cyan); background: var(--ace-light); }
+    .zone-letter {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: .9rem; margin: 0 auto 6px;
+    }
+    .current-pkg {
+      background: #fff; border-radius: 10px; padding: 14px 18px;
+      border: 1.5px solid var(--ace-cyan);
+    }
+    .history-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: .85rem;
+    }
+    .history-row:last-child { border: none; }
+  </style>
+</head>
+<body>
+
+<!-- Botón hamburguesa (solo visible en móvil) -->
+<button id="btn-menu" onclick="toggleMenu()"
+  style="display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--ace-navy);padding:4px 8px">
+  ☰
+</button>
+<!-- Overlay oscuro detrás del sidebar -->
+<div id="overlay-sidebar" onclick="toggleMenu()"></div>
+
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../../index.html">
+      <img src="../../images/logoace1.jpeg" alt="ACE Logístico" class="sidebar-logo-img"/>
+    </a>
+  </div>
+  <ul class="nav flex-column sidebar-nav mt-2">
+    <li class="nav-item"><a class="nav-link" href="../../index.html"><i class="bi bi-house-door"></i> Inicio</a></li>
+    <li class="nav-item"><a class="nav-link" href="../capacitacion/capacitacion.html"><i class="bi bi-journal-bookmark"></i> Capacitación</a></li>
+    <li class="nav-item"><a class="nav-link active" href="simulacion3d.html"><i class="bi bi-box-seam"></i> Simulación 3D</a></li>
+    <li class="nav-item"><a class="nav-link" href="../simulacion2d/simulacion2d.html"><i class="bi bi-display"></i> Simulación 2D</a></li>
+    <li class="nav-item"><a class="nav-link" href="../clasificacion/clasificacion.html"><i class="bi bi-tags"></i> Clasificación de paquetes</a></li>
+    <li class="nav-item"><a class="nav-link" href="../escaneo/escaneo.html"><i class="bi bi-upc-scan"></i> Escaneo y etiquetado</a></li>
+    <li class="nav-item"><a class="nav-link" href="../rutas/rutas.html"><i class="bi bi-arrow-left-right"></i> Rutas de banda</a></li>
+    <li class="nav-item"><a class="nav-link" href="../kpis/kpis.html"><i class="bi bi-bar-chart-line"></i> KPIs y rendimiento</a></li>
+    <li class="nav-item"><a class="nav-link" href="../reportes/reportes.html"><i class="bi bi-file-earmark-text"></i> Reportes</a></li>
+    <li class="nav-item"><a class="nav-link" href="../configuracion/configuracion.html"><i class="bi bi-gear"></i> Configuración</a></li>
+  </ul>
+</nav>
+
+<header id="topbar" class="d-flex align-items-center justify-content-between">
+  <div>
+    <div class="topbar-title">Entrenamiento de Operarios de Almacén</div>
+    <div class="topbar-sub">Sistema de capacitación interactiva ACE Logístico</div>
+  </div>
+  <div class="d-flex align-items-center gap-3">
+    <input class="search-box" type="text" placeholder="🔍  Buscar módulos…"/>
+    <button class="btn btn-light position-relative">
+      <i class="bi bi-bell fs-5"></i>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:.6rem">3</span>
+    </button>
+    <div class="d-flex align-items-center gap-2">
+      <div><div style="font-size:.85rem;font-weight:600">Carolina Dominguez,Eyvar Perez,Adolfo Hernandez</div><div style="font-size:.72rem;color:#888">Nivel 3</div></div>
+      <div class="avatar-circle">CM</div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="sub-header">
+    <div class="sub-header-left">
+      <a href="../../index.html" class="btn-back"><i class="bi bi-arrow-left"></i> Volver al inicio</a>
+      <div>
+        <h2>Simulación 3D</h2>
+        <p>Clasifica los paquetes en la zona correcta de la banda transportadora</p>
+      </div>
+    </div>
+    <a href="../simulacion2d/simulacion2d.html" class="btn-cyan-ace">Ir a Simulación 2D →</a>
+  </div>
+
+  <div class="page-body">
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-pill"><div class="val" id="pts">0</div><div class="lbl">Puntos</div></div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-pill" style="border-color:#22c55e">
+          <div class="val" style="color:#22c55e" id="prec">100%</div><div class="lbl">Precisión</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-pill" style="border-color:#22c55e">
+          <div class="val" style="color:#22c55e" id="pqs">0/6</div><div class="lbl">Paquetes</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-pill" style="border-color:#7c3aed">
+          <div class="val" style="color:#7c3aed" id="tmr">00:00</div><div class="lbl">Tiempo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="belt-2d mb-3">
+          <div style="color:#8a9cc0;font-size:.78rem;margin-bottom:8px">
+            Banda Transportadora — Vista 2D
+            <button onclick="togglePause()" id="pauseBtn" style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:5px;padding:3px 10px;font-size:.75rem;margin-left:12px">⏸ Pausar</button>
+            <button onclick="resetGame()" style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:5px;padding:3px 10px;font-size:.75rem;margin-left:6px">↺ Reiniciar</button>
+          </div>
+          <div class="belt-track">
+            <div class="pkg-2d" style="background:var(--ace-cyan)">A1</div>
+            <div class="pkg-2d" style="background:#22c55e">B5</div>
+            <div class="pkg-2d" style="background:#f97316">C2</div>
+            <span style="color:#4a5a7c;font-size:.8rem;margin-left:auto">→</span>
+          </div>
+        </div>
+
+        <div class="current-pkg mb-3">
+          <div style="font-size:.75rem;color:#888">Paquete escaneado:</div>
+          <div class="d-flex align-items-center gap-3 mt-1">
+            <div class="pkg-2d" style="width:48px;height:40px;font-size:.85rem" id="currPkgBadge">A1</div>
+            <div>
+              <div class="fw-bold" id="currPkgName">P001</div>
+              <div style="font-size:.8rem;color:#888" id="currPkgWt">Peso: 2.3 kg</div>
+            </div>
+            <div class="ms-auto text-end">
+              <div style="font-size:.78rem;color:var(--ace-cyan);font-weight:600">¿A dónde va?</div>
+              <div style="font-size:.75rem;color:#aaa">Selecciona la zona correcta →</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-2" id="zoneButtons">
+          <div class="col-6 col-md-3">
+            <div class="zone-btn" onclick="classify('A')">
+              <div class="zone-letter" style="background:#e8f4fd;color:var(--ace-cyan)">A</div>
+              <div style="font-size:.82rem;font-weight:600">Zona A</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="zone-btn" onclick="classify('B')">
+              <div class="zone-letter" style="background:#e6f9f0;color:#22c55e">B</div>
+              <div style="font-size:.82rem;font-weight:600">Zona B</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="zone-btn" onclick="classify('C')">
+              <div class="zone-letter" style="background:#fff7e6;color:#d97706">C</div>
+              <div style="font-size:.82rem;font-weight:600">Zona C</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="zone-btn" onclick="classify('D')">
+              <div class="zone-letter" style="background:#fde8e8;color:#c0392b">D</div>
+              <div style="font-size:.82rem;font-weight:600">Zona D</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);height:100%">
+          <div class="fw-bold mb-3">Historial de clasificaciones</div>
+          <div id="historyList">
+            <div style="color:#bbb;font-size:.85rem;text-align:center;padding:40px 0">Las clasificaciones aparecerán aquí</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const packages = [
+  { id:'P001', zone:'A', weight:'2.3 kg', color:'var(--ace-cyan)', label:'A1' },
+  { id:'P002', zone:'B', weight:'1.8 kg', color:'#22c55e',        label:'B5' },
+  { id:'P003', zone:'C', weight:'4.1 kg', color:'#f97316',        label:'C2' },
+  { id:'P004', zone:'A', weight:'0.9 kg', color:'var(--ace-cyan)', label:'A3' },
+  { id:'P005', zone:'D', weight:'3.2 kg', color:'#c0392b',        label:'D1' },
+  { id:'P006', zone:'B', weight:'2.7 kg', color:'#22c55e',        label:'B2' },
+];
+let current=0, points=0, correct=0, total=0, paused=false, sec=0, timerInterval;
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    if (!paused) {
+      sec++;
+      const m = String(Math.floor(sec/60)).padStart(2,'0');
+      const s = String(sec%60).padStart(2,'0');
+      document.getElementById('tmr').textContent = m+':'+s;
+    }
+  }, 1000);
+}
+
+function renderCurrent() {
+  if (current >= packages.length) {
+    clearInterval(timerInterval);
+    document.querySelector('.current-pkg').innerHTML =
+      '<div style="text-align:center;padding:20px"><div style="font-size:1.5rem">🎉</div><div class="fw-bold">¡Simulación completada!</div><div style="color:#888;font-size:.85rem">Puntos: '+points+'</div></div>';
+    document.getElementById('zoneButtons').style.opacity='.4';
+    document.getElementById('zoneButtons').style.pointerEvents='none';
+    return;
+  }
+  const p = packages[current];
+  document.getElementById('currPkgBadge').textContent = p.label;
+  document.getElementById('currPkgBadge').style.background = p.color;
+  document.getElementById('currPkgName').textContent = p.id;
+  document.getElementById('currPkgWt').textContent = 'Peso: ' + p.weight;
+}
+
+function classify(zone) {
+  if (paused || current >= packages.length) return;
+  const p = packages[current];
+  total++;
+  const ok = zone === p.zone;
+  if (ok) { points += 10; correct++; }
+  document.getElementById('pts').textContent = points;
+  document.getElementById('pqs').textContent = total+'/'+packages.length;
+  document.getElementById('prec').textContent = Math.round((correct/total)*100)+'%';
+  const list = document.getElementById('historyList');
+  const ph = list.querySelector('div[style*="text-align:center"]');
+  if (ph) ph.remove();
+  const row = document.createElement('div');
+  row.className = 'history-row';
+  row.innerHTML = `<div class="d-flex align-items-center gap-2">
+    <span style="background:${p.color};color:#fff;border-radius:6px;padding:2px 8px;font-size:.75rem;font-weight:700">${p.label}</span>
+    <span>${p.id}</span></div>
+    <div class="d-flex align-items-center gap-2">
+      <span style="color:#888;font-size:.78rem">Zona ${zone}</span>
+      <span>${ok?'✅':'❌'}</span>
+    </div>`;
+  list.prepend(row);
+  current++;
+  renderCurrent();
+}
+
+function togglePause() {
+  paused = !paused;
+  document.getElementById('pauseBtn').textContent = paused ? '▶ Reanudar' : '⏸ Pausar';
+}
+
+function resetGame() {
+  current=0; points=0; correct=0; total=0; sec=0; paused=false;
+  clearInterval(timerInterval);
+  document.getElementById('pts').textContent='0';
+  document.getElementById('prec').textContent='100%';
+  document.getElementById('pqs').textContent='0/'+packages.length;
+  document.getElementById('tmr').textContent='00:00';
+  document.getElementById('historyList').innerHTML='<div style="color:#bbb;font-size:.85rem;text-align:center;padding:40px 0">Las clasificaciones aparecerán aquí</div>';
+  document.getElementById('zoneButtons').style.opacity='1';
+  document.getElementById('zoneButtons').style.pointerEvents='auto';
+  document.getElementById('pauseBtn').textContent='⏸ Pausar';
+  renderCurrent();
+  startTimer();
+}
+
+renderCurrent();
+startTimer();
+</script>
+<script src="../../js/bootstrap.bundle.min.js"></script>
+<script src="../../js/main.js"></script>
+<script>
+function toggleMenu() {
+  document.getElementById('sidebar').classList.toggle('abierto');
+  document.getElementById('overlay-sidebar').classList.toggle('visible');
+}
+</script>
+</body>
+</html>

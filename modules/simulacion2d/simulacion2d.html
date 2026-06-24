@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ACE – Simulación 2D</title>
+  <link rel="stylesheet" href="../../css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../../css/styles.css">
+  <style>
+    .stat-pill {
+      background: #fff; border-radius: 10px; padding: 14px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06); border-left: 4px solid var(--ace-cyan);
+    }
+    .stat-pill .val { font-size: 1.6rem; font-weight: 800; color: var(--ace-navy); }
+    .stat-pill .lbl { font-size: .75rem; color: #888; }
+    #game-container {
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.2);
+    }
+    .history-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: .85rem;
+    }
+    .history-row:last-child { border: none; }
+  </style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../../index.html">
+      <img src="../../images/logoace1.jpeg" alt="ACE Logístico" class="sidebar-logo-img"/>
+    </a>
+  </div>
+  <ul class="nav flex-column sidebar-nav mt-2">
+    <li class="nav-item"><a class="nav-link" href="../../index.html"><i class="bi bi-house-door"></i> Inicio</a></li>
+    <li class="nav-item"><a class="nav-link" href="../capacitacion/capacitacion.html"><i class="bi bi-journal-bookmark"></i> Capacitación</a></li>
+    <li class="nav-item"><a class="nav-link" href="../simulacion3d/simulacion3d.html"><i class="bi bi-box-seam"></i> Simulación 3D</a></li>
+    <li class="nav-item"><a class="nav-link active" href="simulacion2d.html"><i class="bi bi-display"></i> Simulación 2D</a></li>
+    <li class="nav-item"><a class="nav-link" href="../clasificacion/clasificacion.html"><i class="bi bi-tags"></i> Clasificación de paquetes</a></li>
+    <li class="nav-item"><a class="nav-link" href="../escaneo/escaneo.html"><i class="bi bi-upc-scan"></i> Escaneo y etiquetado</a></li>
+    <li class="nav-item"><a class="nav-link" href="../rutas/rutas.html"><i class="bi bi-arrow-left-right"></i> Rutas de banda</a></li>
+    <li class="nav-item"><a class="nav-link" href="../kpis/kpis.html"><i class="bi bi-bar-chart-line"></i> KPIs y rendimiento</a></li>
+    <li class="nav-item"><a class="nav-link" href="../reportes/reportes.html"><i class="bi bi-file-earmark-text"></i> Reportes</a></li>
+    <li class="nav-item"><a class="nav-link" href="../configuracion/configuracion.html"><i class="bi bi-gear"></i> Configuración</a></li>
+  </ul>
+</nav>
+
+<!-- Botón hamburguesa (solo visible en móvil) -->
+<button id="btn-menu" onclick="toggleMenu()"
+  style="display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--ace-navy);padding:4px 8px">
+  ☰
+</button>
+<!-- Overlay oscuro detrás del sidebar -->
+<div id="overlay-sidebar" onclick="toggleMenu()"></div>
+
+<header id="topbar" class="d-flex align-items-center justify-content-between">
+  <div>
+    <div class="topbar-title">Entrenamiento de Operarios de Almacén</div>
+    <div class="topbar-sub">Sistema de capacitación interactiva ACE Logístico</div>
+  </div>
+  <div class="d-flex align-items-center gap-3">
+    <input class="search-box" type="text" placeholder="Buscar módulos…"/>
+    <button class="btn btn-light position-relative">
+      <i class="bi bi-bell fs-5"></i>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:.6rem">3</span>
+    </button>
+    <div class="d-flex align-items-center gap-2">
+      <div><div style="font-size:.85rem;font-weight:600">Carolina Dominguez,Eyvar Perez,Adolfo Hernandez</div><div style="font-size:.72rem;color:#888">Nivel 3</div></div>
+      <div class="avatar-circle">CM</div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="sub-header">
+    <div class="sub-header-left">
+      <a href="../../index.html" class="btn-back"><i class="bi bi-arrow-left"></i> Volver al inicio</a>
+      <div>
+        <h2>Simulación 2D</h2>
+        <p>Clasifica los paquetes en la zona correcta de la banda transportadora</p>
+      </div>
+    </div>
+    <a href="../simulacion3d/simulacion3d.html" class="btn-cyan-ace">Ir a Simulación 3D →</a>
+  </div>
+
+  <div class="page-body">
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-pill"><div class="val" id="pts">0</div><div class="lbl">Puntos</div></div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-pill" style="border-color:#22c55e">
+          <div class="val" style="color:#22c55e" id="prec">100%</div><div class="lbl">Precisión</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-pill" style="border-color:#22c55e">
+          <div class="val" style="color:#22c55e" id="vidas">3 ❤️</div><div class="lbl">Vidas</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-pill" style="border-color:#7c3aed">
+          <div class="val" style="color:#7c3aed" id="nivel">Nivel 1</div><div class="lbl">Dificultad</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- Phaser canvas -->
+      <div class="col-lg-8">
+        <div id="game-container"></div>
+        <div class="d-flex gap-2 mt-3">
+          <button onclick="reiniciarJuego()" class="btn-primary-ace">
+            <i class="bi bi-arrow-clockwise"></i> Reiniciar
+          </button>
+          <button onclick="pausarJuego()" class="btn-cyan-ace" id="btnPausa">
+            <i class="bi bi-pause-fill"></i> Pausar
+          </button>
+        </div>
+      </div>
+
+      <!-- Historial -->
+      <div class="col-lg-4">
+        <div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+          <div class="fw-bold mb-1">Historial de clasificaciones</div>
+          <div style="font-size:.75rem;color:#888;margin-bottom:12px" id="resumenTexto">Clasifica paquetes para ver el historial</div>
+          <div id="historyList">
+            <div style="color:#bbb;font-size:.82rem;text-align:center;padding:30px 0">
+              Las clasificaciones aparecerán aquí
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla final (oculta hasta terminar) -->
+        <div id="tablaFinal" style="display:none;background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-top:16px">
+          <div class="fw-bold mb-3" style="color:var(--ace-navy)">Resultado final</div>
+          <div class="d-flex justify-content-between mb-2">
+            <span style="font-size:.85rem">Puntos totales</span>
+            <span class="fw-bold" id="finalPts">0</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span style="font-size:.85rem">Precisión</span>
+            <span class="fw-bold" id="finalPrec">0%</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span style="font-size:.85rem">Nivel alcanzado</span>
+            <span class="fw-bold" id="finalNivel">1</span>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <span style="font-size:.85rem">Calificación</span>
+            <span class="fw-bold" id="finalCalif" style="color:var(--ace-cyan)">—</span>
+          </div>
+          <button onclick="reiniciarJuego()" class="btn-primary-ace w-100 justify-content-center">
+            <i class="bi bi-arrow-clockwise"></i> Jugar de nuevo
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script src="../../js/bootstrap.bundle.min.js"></script>
+<script src="../../js/main.js"></script>
+<script src="../../js/phaser.min.js"></script>
+<script src="../../js/game.js"></script>
+<script>
+function toggleMenu() {
+  document.getElementById('sidebar').classList.toggle('abierto');
+  document.getElementById('overlay-sidebar').classList.toggle('visible');
+}
+</script>
+</body>
+</html>
