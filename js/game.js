@@ -5,35 +5,36 @@ class EscenaPrincipal extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('prueba', '../../images/prueba.jpeg');
+        this.load.image('fondo', '../../images/imagenfondo.png');
+        this.load.image('trabajador', '../../images/trabajadorAlmacen1.png');
     }
 
     create() {
 
-        const imagen = this.add.image(400, 200, 'prueba');
+        // ── Fondo: cubre todo el lienzo (800x600) ──
+        const fondo = this.add.image(0, 0, 'fondo').setOrigin(0, 0);
+        fondo.setDisplaySize(this.scale.width, this.scale.height);
 
-        imagen.setScale(0.3);
+        // ── Trabajador: imagen movible ──
+        const trabajador = this.add.image(400, 450, 'trabajador');
+        trabajador.setScale(0.5); // ajusta este valor según el tamaño real de tu imagen
 
-        const texto = this.add.text(
-            400,
-            450,
-            '¡Phaser funciona!',
-            {
-                fontSize: '36px',
-                fontFamily: 'Arial',
-                color: '#00ff00',
-                fontStyle: 'bold'
-            }
-        );
+        trabajador.setInteractive();
+        this.input.setDraggable(trabajador);
 
-        texto.setOrigin(0.5);
-        
-        this.tweens.add({
-            targets: texto,
-            alpha: 0.5,
-            duration: 1000,
-            yoyo: true,
-            repeat: -1
+        // Efecto visual mientras se arrastra
+        this.input.on('dragstart', (pointer, gameObject) => {
+            gameObject.setTint(0xcccccc);
+        });
+
+        // Mover el objeto siguiendo el cursor/dedo, sin salirse del lienzo
+        this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+            gameObject.x = Phaser.Math.Clamp(dragX, 0, this.scale.width);
+            gameObject.y = Phaser.Math.Clamp(dragY, 0, this.scale.height);
+        });
+
+        this.input.on('dragend', (pointer, gameObject) => {
+            gameObject.clearTint();
         });
     }
 }
@@ -51,4 +52,24 @@ const config = {
     scene: EscenaPrincipal
 };
 
-new Phaser.Game(config);
+const game = new Phaser.Game(config);
+
+// ── Pantalla completa ──
+function toggleFullscreenGame() {
+    if (!game.scale.isFullscreen) {
+        game.scale.startFullscreen();
+    } else {
+        game.scale.stopFullscreen();
+    }
+}
+
+// Actualiza el texto/ícono del botón según el estado actual
+game.scale.on('enterfullscreen', () => {
+    const btn = document.getElementById('btnFullscreen');
+    if (btn) btn.innerHTML = '<i class="bi bi-fullscreen-exit"></i> Salir de pantalla completa';
+});
+
+game.scale.on('leavefullscreen', () => {
+    const btn = document.getElementById('btnFullscreen');
+    if (btn) btn.innerHTML = '<i class="bi bi-arrows-fullscreen"></i> Pantalla completa';
+});
