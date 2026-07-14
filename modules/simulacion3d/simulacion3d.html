@@ -5,59 +5,196 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ACE – Simulación 3D</title>
   <link rel="stylesheet" href="../../css/bootstrap.min.css">
-  <link rel="stylesheet" href="../../css/styles.css">
   <link rel="stylesheet" href="../../css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../../css/styles.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./js/three.module.min.js"
+    }
+  }
+  </script>
   <style>
-    .stat-pill {
-      background: #fff; border-radius: 10px; padding: 14px 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.06); border-left: 4px solid var(--ace-cyan);
+    #game-wrapper-3d {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
     }
-    .stat-pill .val { font-size: 1.6rem; font-weight: 800; color: var(--ace-navy); }
-    .stat-pill .lbl { font-size: .75rem; color: #888; }
-    .belt-2d {
-      background: #0d1117; border-radius: 12px; padding: 20px;
+
+    #contenedor-3d {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.25);
+      background: #1b2436;
+      cursor: crosshair;
     }
-    .belt-track {
-      height: 60px; background: #1a2035; border-radius: 8px;
-      border: 1px solid #2a3a5c; display: flex; align-items: center;
-      padding: 0 12px; gap: 12px; margin-bottom: 16px;
+    #contenedor-3d canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
     }
-    .pkg-2d {
-      width: 44px; height: 36px; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: .75rem; font-weight: 700; color: #fff; flex-shrink: 0;
+
+    /* ── HUD básico (siempre visible) ── */
+    #hud-vista-caja {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(18,22,31,.72);
+      color: #f2c14e;
+      font-size: .78rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 8px;
+      letter-spacing: .02em;
+      z-index: 3;
     }
-    .zone-btn {
-      background: #fff; border: 1.5px solid #e5e7eb; border-radius: 10px;
-      padding: 18px 12px; text-align: center; cursor: pointer;
-      transition: border-color .15s, background .15s;
+    #hud-embalaje-caja {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(18,22,31,.72);
+      color: #22c55e;
+      font-size: .74rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      z-index: 3;
+      max-width: 220px;
+      text-align: right;
     }
-    .zone-btn:hover { border-color: var(--ace-cyan); background: var(--ace-light); }
-    .zone-letter {
-      width: 32px; height: 32px; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: .9rem; margin: 0 auto 6px;
+    #hud-cargando {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(27,36,54,.92);
+      color: #f2c14e;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: .04em;
+      z-index: 5;
     }
-    .current-pkg {
-      background: #fff; border-radius: 10px; padding: 14px 18px;
-      border: 1.5px solid var(--ace-cyan);
+    #hud-controles {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(18,22,31,.72);
+      color: #cfd6e0;
+      font-size: .7rem;
+      line-height: 1.5;
+      padding: 8px 12px;
+      border-radius: 8px;
+      z-index: 3;
     }
-    .history-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: .85rem;
+    #hud-controles b { color: #f2c14e; }
+
+    /* ── HUD exclusivo del modo primera persona ── */
+    #hud-fp-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 4;
+      display: none;
     }
-    .history-row:last-child { border: none; }
+    #hud-fp-overlay.activo { display: block; }
+
+    #hud-crosshair {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      margin: -4px 0 0 -4px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.75);
+      transition: transform .1s, border-color .1s;
+    }
+    #hud-crosshair.activo {
+      border-color: #f2c14e;
+      transform: scale(1.6);
+    }
+
+    #hud-prompt {
+      position: absolute;
+      bottom: 78px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(18,22,31,.85);
+      color: #fff;
+      font-size: .82rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 20px;
+      opacity: 0;
+      transition: opacity .12s;
+      white-space: nowrap;
+    }
+    #hud-prompt.visible { opacity: 1; }
+
+    #hud-held {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(18,22,31,.78);
+      color: #f2c14e;
+      font-size: .78rem;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity .12s;
+    }
+    #hud-held.visible { opacity: 1; }
+
+    #hud-metrics {
+      position: absolute;
+      top: 56px;
+      right: 12px;
+      background: rgba(18,22,31,.78);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      gap: 4px 14px;
+      font-size: .7rem;
+      color: #cfd6e0;
+    }
+    #hud-metrics .num { display:block; font-size: .95rem; font-weight: 800; color: #fff; }
+    #hud-metrics .ok .num { color: #22c55e; }
+    #hud-metrics .bad .num { color: #e53e3e; }
+
+    #hud-flash {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #hud-flash.correcto { animation: flashOk .45s ease-out; }
+    #hud-flash.incorrecto { animation: flashBad .45s ease-out; }
+    @keyframes flashOk { 0% { opacity:.35; background:#22c55e; } 100% { opacity:0; } }
+    @keyframes flashBad { 0% { opacity:.35; background:#e53e3e; } 100% { opacity:0; } }
+
+    #hud-click-lock {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(18,22,31,.55);
+      color: #fff;
+      font-weight: 700;
+      font-size: .95rem;
+      text-align: center;
+      pointer-events: none;
+    }
+    #hud-click-lock.visible { display: flex; }
   </style>
 </head>
 <body>
-
-<!-- Botón hamburguesa (solo visible en móvil) -->
-<button id="btn-menu" onclick="toggleMenu()"
-  style="display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--ace-navy);padding:4px 8px">
-  ☰
-</button>
-<!-- Overlay oscuro detrás del sidebar -->
-<div id="overlay-sidebar" onclick="toggleMenu()"></div>
 
 <nav id="sidebar">
   <div class="sidebar-logo">
@@ -79,20 +216,20 @@
   </ul>
 </nav>
 
+<button id="btn-menu" onclick="toggleMenu()">☰</button>
+<div id="overlay-sidebar" onclick="toggleMenu()"></div>
+
 <header id="topbar" class="d-flex align-items-center justify-content-between">
   <div>
     <div class="topbar-title">Entrenamiento de Operarios de Almacén</div>
     <div class="topbar-sub">Sistema de capacitación interactiva ACE Logístico</div>
   </div>
   <div class="d-flex align-items-center gap-3">
-    <input class="search-box" type="text" placeholder="🔍  Buscar módulos…"/>
-    <button class="btn btn-light position-relative">
-      <i class="bi bi-bell fs-5"></i>
-      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:.6rem">3</span>
-    </button>
+    <input class="search-box" type="text" placeholder="Buscar módulos…"/>
     <div class="d-flex align-items-center gap-2">
-      <div><div style="font-size:.85rem;font-weight:600">Carolina Dominguez,Eyvar Perez,Adolfo Hernandez</div><div style="font-size:.72rem;color:#888">Nivel 3</div></div>
-      <div class="avatar-circle">CM</div>
+      <div><div style="font-size:.85rem;font-weight:600">Carolina Dominguez</div>
+      <div style="font-size:.72rem;color:#888">Nivel 3</div></div>
+      <div class="avatar-circle">CD</div>
     </div>
   </div>
 </header>
@@ -103,199 +240,56 @@
       <a href="../../index.html" class="btn-back"><i class="bi bi-arrow-left"></i> Volver al inicio</a>
       <div>
         <h2>Simulación 3D</h2>
-        <p>Clasifica los paquetes en la zona correcta de la banda transportadora</p>
+        <p>Recorre el almacén en primera persona y practica el embalaje: recoge, empaca, sella y acomoda</p>
       </div>
     </div>
     <a href="../simulacion2d/simulacion2d.html" class="btn-cyan-ace">Ir a Simulación 2D →</a>
   </div>
 
   <div class="page-body">
-    <div class="row g-3 mb-4">
-      <div class="col-6 col-md-3">
-        <div class="stat-pill"><div class="val" id="pts">0</div><div class="lbl">Puntos</div></div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="stat-pill" style="border-color:#22c55e">
-          <div class="val" style="color:#22c55e" id="prec">100%</div><div class="lbl">Precisión</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="stat-pill" style="border-color:#22c55e">
-          <div class="val" style="color:#22c55e" id="pqs">0/6</div><div class="lbl">Paquetes</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="stat-pill" style="border-color:#7c3aed">
-          <div class="val" style="color:#7c3aed" id="tmr">00:00</div><div class="lbl">Tiempo</div>
-        </div>
-      </div>
-    </div>
+    <div id="game-wrapper-3d">
+      <div id="contenedor-3d">
+        <div id="hud-cargando">Cargando almacén…</div>
 
-    <div class="row g-4">
-      <div class="col-lg-7">
-        <div class="belt-2d mb-3">
-          <div style="color:#8a9cc0;font-size:.78rem;margin-bottom:8px">
-            Banda Transportadora — Vista 2D
-            <button onclick="togglePause()" id="pauseBtn" style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:5px;padding:3px 10px;font-size:.75rem;margin-left:12px">⏸ Pausar</button>
-            <button onclick="resetGame()" style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:5px;padding:3px 10px;font-size:.75rem;margin-left:6px">↺ Reiniciar</button>
-          </div>
-          <div class="belt-track">
-            <div class="pkg-2d" style="background:var(--ace-cyan)">A1</div>
-            <div class="pkg-2d" style="background:#22c55e">B5</div>
-            <div class="pkg-2d" style="background:#f97316">C2</div>
-            <span style="color:#4a5a7c;font-size:.8rem;margin-left:auto">→</span>
-          </div>
+        <div id="hud-vista-caja">Vista: <span id="hud-vista">—</span></div>
+        <div id="hud-embalaje-caja"><span id="hud-embalaje">Estación automática en espera…</span></div>
+
+        <div id="hud-controles">
+          <b>C</b> cambiar vista &nbsp;·&nbsp; <b>Clic</b> activar control (en primera persona)<br>
+          <b>WASD</b> moverse &nbsp;·&nbsp; <b>Mouse</b> mirar &nbsp;·&nbsp; <b>E</b> interactuar &nbsp;·&nbsp; <b>Q</b> soltar
         </div>
 
-        <div class="current-pkg mb-3">
-          <div style="font-size:.75rem;color:#888">Paquete escaneado:</div>
-          <div class="d-flex align-items-center gap-3 mt-1">
-            <div class="pkg-2d" style="width:48px;height:40px;font-size:.85rem" id="currPkgBadge">A1</div>
-            <div>
-              <div class="fw-bold" id="currPkgName">P001</div>
-              <div style="font-size:.8rem;color:#888" id="currPkgWt">Peso: 2.3 kg</div>
-            </div>
-            <div class="ms-auto text-end">
-              <div style="font-size:.78rem;color:var(--ace-cyan);font-weight:600">¿A dónde va?</div>
-              <div style="font-size:.75rem;color:#aaa">Selecciona la zona correcta →</div>
-            </div>
+        <!-- HUD exclusivo del modo práctica en primera persona -->
+        <div id="hud-fp-overlay">
+          <div id="hud-crosshair"></div>
+          <div id="hud-prompt"></div>
+          <div id="hud-held"></div>
+          <div id="hud-metrics">
+            <div>Tiempo<span class="num" id="hud-tiempo">00:00</span></div>
+            <div class="ok">Correctas<span class="num" id="hud-correctas">0</span></div>
+            <div class="bad">Incorrectas<span class="num" id="hud-incorrectas">0</span></div>
+            <div style="grid-column: 1 / -1;">Eficiencia<span class="num" id="hud-eficiencia">100%</span></div>
           </div>
-        </div>
-
-        <div class="row g-2" id="zoneButtons">
-          <div class="col-6 col-md-3">
-            <div class="zone-btn" onclick="classify('A')">
-              <div class="zone-letter" style="background:#e8f4fd;color:var(--ace-cyan)">A</div>
-              <div style="font-size:.82rem;font-weight:600">Zona A</div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3">
-            <div class="zone-btn" onclick="classify('B')">
-              <div class="zone-letter" style="background:#e6f9f0;color:#22c55e">B</div>
-              <div style="font-size:.82rem;font-weight:600">Zona B</div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3">
-            <div class="zone-btn" onclick="classify('C')">
-              <div class="zone-letter" style="background:#fff7e6;color:#d97706">C</div>
-              <div style="font-size:.82rem;font-weight:600">Zona C</div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3">
-            <div class="zone-btn" onclick="classify('D')">
-              <div class="zone-letter" style="background:#fde8e8;color:#c0392b">D</div>
-              <div style="font-size:.82rem;font-weight:600">Zona D</div>
-            </div>
-          </div>
+          <div id="hud-flash"></div>
+          <div id="hud-click-lock">Haz clic sobre la escena<br>para activar los controles</div>
         </div>
       </div>
 
-      <div class="col-lg-5">
-        <div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);height:100%">
-          <div class="fw-bold mb-3">Historial de clasificaciones</div>
-          <div id="historyList">
-            <div style="color:#bbb;font-size:.85rem;text-align:center;padding:40px 0">Las clasificaciones aparecerán aquí</div>
-          </div>
-        </div>
+      <div class="mt-3" style="background:#fff;border-radius:12px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.06);font-size:.85rem;color:#555">
+        <b>Objetivo de la práctica:</b> ve a <b>Recepción</b> y recoge un producto (E), llévalo a la <b>mesa de embalaje</b>
+        y colócalo en la caja del tamaño correcto (E), sella la caja con la cinta (E), luego lleva la caja al
+        <b>estante</b> y ubícala en un espacio libre (E). Cambia a la vista "Primera persona (práctica)" con la tecla <b>C</b>.
       </div>
     </div>
   </div>
 </main>
 
 <script>
-const packages = [
-  { id:'P001', zone:'A', weight:'2.3 kg', color:'var(--ace-cyan)', label:'A1' },
-  { id:'P002', zone:'B', weight:'1.8 kg', color:'#22c55e',        label:'B5' },
-  { id:'P003', zone:'C', weight:'4.1 kg', color:'#f97316',        label:'C2' },
-  { id:'P004', zone:'A', weight:'0.9 kg', color:'var(--ace-cyan)', label:'A3' },
-  { id:'P005', zone:'D', weight:'3.2 kg', color:'#c0392b',        label:'D1' },
-  { id:'P006', zone:'B', weight:'2.7 kg', color:'#22c55e',        label:'B2' },
-];
-let current=0, points=0, correct=0, total=0, paused=false, sec=0, timerInterval;
-
-function startTimer() {
-  timerInterval = setInterval(() => {
-    if (!paused) {
-      sec++;
-      const m = String(Math.floor(sec/60)).padStart(2,'0');
-      const s = String(sec%60).padStart(2,'0');
-      document.getElementById('tmr').textContent = m+':'+s;
-    }
-  }, 1000);
-}
-
-function renderCurrent() {
-  if (current >= packages.length) {
-    clearInterval(timerInterval);
-    document.querySelector('.current-pkg').innerHTML =
-      '<div style="text-align:center;padding:20px"><div style="font-size:1.5rem">🎉</div><div class="fw-bold">¡Simulación completada!</div><div style="color:#888;font-size:.85rem">Puntos: '+points+'</div></div>';
-    document.getElementById('zoneButtons').style.opacity='.4';
-    document.getElementById('zoneButtons').style.pointerEvents='none';
-    return;
-  }
-  const p = packages[current];
-  document.getElementById('currPkgBadge').textContent = p.label;
-  document.getElementById('currPkgBadge').style.background = p.color;
-  document.getElementById('currPkgName').textContent = p.id;
-  document.getElementById('currPkgWt').textContent = 'Peso: ' + p.weight;
-}
-
-function classify(zone) {
-  if (paused || current >= packages.length) return;
-  const p = packages[current];
-  total++;
-  const ok = zone === p.zone;
-  if (ok) { points += 10; correct++; }
-  document.getElementById('pts').textContent = points;
-  document.getElementById('pqs').textContent = total+'/'+packages.length;
-  document.getElementById('prec').textContent = Math.round((correct/total)*100)+'%';
-  const list = document.getElementById('historyList');
-  const ph = list.querySelector('div[style*="text-align:center"]');
-  if (ph) ph.remove();
-  const row = document.createElement('div');
-  row.className = 'history-row';
-  row.innerHTML = `<div class="d-flex align-items-center gap-2">
-    <span style="background:${p.color};color:#fff;border-radius:6px;padding:2px 8px;font-size:.75rem;font-weight:700">${p.label}</span>
-    <span>${p.id}</span></div>
-    <div class="d-flex align-items-center gap-2">
-      <span style="color:#888;font-size:.78rem">Zona ${zone}</span>
-      <span>${ok?'✅':'❌'}</span>
-    </div>`;
-  list.prepend(row);
-  current++;
-  renderCurrent();
-}
-
-function togglePause() {
-  paused = !paused;
-  document.getElementById('pauseBtn').textContent = paused ? '▶ Reanudar' : '⏸ Pausar';
-}
-
-function resetGame() {
-  current=0; points=0; correct=0; total=0; sec=0; paused=false;
-  clearInterval(timerInterval);
-  document.getElementById('pts').textContent='0';
-  document.getElementById('prec').textContent='100%';
-  document.getElementById('pqs').textContent='0/'+packages.length;
-  document.getElementById('tmr').textContent='00:00';
-  document.getElementById('historyList').innerHTML='<div style="color:#bbb;font-size:.85rem;text-align:center;padding:40px 0">Las clasificaciones aparecerán aquí</div>';
-  document.getElementById('zoneButtons').style.opacity='1';
-  document.getElementById('zoneButtons').style.pointerEvents='auto';
-  document.getElementById('pauseBtn').textContent='⏸ Pausar';
-  renderCurrent();
-  startTimer();
-}
-
-renderCurrent();
-startTimer();
-</script>
-<script src="../../js/bootstrap.bundle.min.js"></script>
-<script src="../../js/main.js"></script>
-<script>
 function toggleMenu() {
   document.getElementById('sidebar').classList.toggle('abierto');
   document.getElementById('overlay-sidebar').classList.toggle('visible');
 }
 </script>
+<script type="module" src="js/simulacion3d.js"></script>
 </body>
 </html>
