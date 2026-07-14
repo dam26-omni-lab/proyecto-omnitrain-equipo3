@@ -1,39 +1,229 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>ACE – Simulación 2D</title>
-    <link rel="stylesheet" href="../../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../css/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../../css/styles.css">
-    <style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ACE – Simulación 2D</title>
+  <link rel="stylesheet" href="../../css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../../css/styles.css">
+  <style>
+    /* ============================================
+       Simulación 2D — estilos
+       ============================================ */
+
+    /* ── Botón hamburguesa (oculto en desktop) ── */
+    #btn-menu {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--ace-navy);
+      padding: 4px 8px;
+    }
+
+    /* ── Badge de notificaciones en el topbar ── */
+    .notif-badge {
+      font-size: .6rem;
+    }
+
+    /* ── Usuario en el topbar ── */
+    .user-name {
+      font-size: .85rem;
+      font-weight: 600;
+    }
+    .user-level {
+      font-size: .72rem;
+      color: #888;
+    }
+
+    /* ── Contenedor del juego + stats ── */
+    #game-wrapper {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
     .stat-pill {
-        background: #fff; border-radius: 10px; padding: 14px 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,.06); border-left: 4px solid var(--ace-cyan);
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+      border-left: 4px solid var(--ace-cyan);
     }
-    .stat-pill .val { font-size: 1.6rem; font-weight: 800; color: var(--ace-navy); }
-    .stat-pill .lbl { font-size: .75rem; color: #888; }
+    .stat-pill .val {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--ace-navy);
+    }
+    .stat-pill .lbl {
+      font-size: .72rem;
+      color: #888;
+    }
+
+    .stat-pill-green { border-color: #22c55e; }
+    .val-green { color: #22c55e; }
+
+    .stat-pill-red { border-color: #e53e3e; }
+    .val-red { color: #e53e3e; }
+
+    .stat-pill-purple { border-color: #7c3aed; }
+    .val-purple { color: #7c3aed; }
+
+    /* ── Canvas de Phaser ── */
     #game-container {
-        border-radius: 12px; overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0,0,0,.2);
+      border-radius: 0 0 12px 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.2);
+      width: 100%;
+      aspect-ratio: 900 / 560;
+      background: #C8A882;
     }
-    .history-row {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: .85rem;
+    #game-container canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
     }
-    .history-row:last-child { border: none; }
-    </style>
+
+    /* ── Tarjetas de información (panel derecho) ── */
+    .info-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+    .info-card-mb {
+      margin-bottom: 16px;
+    }
+    .card-title-sm {
+      font-size: .9rem;
+    }
+    .row-label {
+      font-size: .82rem;
+      color: #888;
+    }
+
+    /* ── Botón "Limpiar" historial ── */
+    .btn-clear {
+      background: none;
+      border: none;
+      font-size: .75rem;
+      color: #aaa;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    /* ── Estado vacío del historial ── */
+    .empty-state {
+      color: #bbb;
+      font-size: .82rem;
+      text-align: center;
+      padding: 24px 0;
+    }
+
+    /* ── Historial de partidas ── */
+    .partida-row {
+      display: grid;
+      grid-template-columns: auto 1fr 1fr 1fr 1fr;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: .82rem;
+    }
+    .partida-row:last-child { border: none; }
+
+    .partida-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--ace-navy);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .72rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .partida-nivel {
+      font-weight: 700;
+      font-size: .82rem;
+    }
+    .partida-fecha {
+      font-size: .72rem;
+      color: #aaa;
+    }
+
+    .partida-stat {
+      text-align: center;
+    }
+    .partida-stat .num {
+      font-weight: 700;
+    }
+    .partida-stat .sublabel {
+      font-size: .7rem;
+      color: #888;
+    }
+    .partida-vidas-sub {
+      font-size: .7rem;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    /* ── Badges de calificación ── */
+    .badge-exc {
+      background: #e6f9f0;
+      color: #1a7f4f;
+      border-radius: 20px;
+      padding: 2px 8px;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .badge-good {
+      background: #e8f4fd;
+      color: #0056b3;
+      border-radius: 20px;
+      padding: 2px 8px;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .badge-ok {
+      background: #fff7e6;
+      color: #d97706;
+      border-radius: 20px;
+      padding: 2px 8px;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .badge-bad {
+      background: #fde8e8;
+      color: #c0392b;
+      border-radius: 20px;
+      padding: 2px 8px;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+  </style>
 </head>
 <body>
 
 <nav id="sidebar">
-    <div class="sidebar-logo">
+  <div class="sidebar-logo">
     <a href="../../index.html">
-        <img src="../../images/logoace1.jpeg" alt="ACE Logístico" class="sidebar-logo-img"/>
+      <img src="../../images/logoace1.jpeg" alt="ACE Logístico" class="sidebar-logo-img"/>
     </a>
-    </div>
-    <ul class="nav flex-column sidebar-nav mt-2">
+  </div>
+  <ul class="nav flex-column sidebar-nav mt-2">
     <li class="nav-item"><a class="nav-link" href="../../index.html"><i class="bi bi-house-door"></i> Inicio</a></li>
     <li class="nav-item"><a class="nav-link" href="../capacitacion/capacitacion.html"><i class="bi bi-journal-bookmark"></i> Capacitación</a></li>
     <li class="nav-item"><a class="nav-link" href="../simulacion3d/simulacion3d.html"><i class="bi bi-box-seam"></i> Simulación 3D</a></li>
@@ -44,177 +234,205 @@
     <li class="nav-item"><a class="nav-link" href="../kpis/kpis.html"><i class="bi bi-bar-chart-line"></i> KPIs y rendimiento</a></li>
     <li class="nav-item"><a class="nav-link" href="../reportes/reportes.html"><i class="bi bi-file-earmark-text"></i> Reportes</a></li>
     <li class="nav-item"><a class="nav-link" href="../configuracion/configuracion.html"><i class="bi bi-gear"></i> Configuración</a></li>
-    </ul>
+  </ul>
 </nav>
 
-<!-- Botón hamburguesa (solo visible en móvil) -->
-<button id="btn-menu" onclick="toggleMenu()"
-    style="display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--ace-navy);padding:4px 8px">
-    ☰
-</button>
-<!-- Overlay oscuro detrás del sidebar -->
+<button id="btn-menu" onclick="toggleMenu()">☰</button>
 <div id="overlay-sidebar" onclick="toggleMenu()"></div>
 
 <header id="topbar" class="d-flex align-items-center justify-content-between">
-    <div>
+  <div>
     <div class="topbar-title">Entrenamiento de Operarios de Almacén</div>
     <div class="topbar-sub">Sistema de capacitación interactiva ACE Logístico</div>
-    </div>
-    <div class="d-flex align-items-center gap-3">
+  </div>
+  <div class="d-flex align-items-center gap-3">
     <input class="search-box" type="text" placeholder="Buscar módulos…"/>
     <button class="btn btn-light position-relative">
-        <i class="bi bi-bell fs-5"></i>
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:.6rem">3</span>
+      <i class="bi bi-bell fs-5"></i>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notif-badge">3</span>
     </button>
     <div class="d-flex align-items-center gap-2">
-        <div><div style="font-size:.85rem;font-weight:600">Carolina Dominguez,Eyvar Perez,Adolfo Hernandez</div><div style="font-size:.72rem;color:#888">Nivel 3</div></div>
-        <div class="avatar-circle">CM</div>
+      <div><div class="user-name">Carolina Dominguez, Eyvar Perez, Adolfo Hernandez</div>
+      <div class="user-level">Nivel 3</div></div>
+      <div class="avatar-circle">CD</div>
     </div>
-    </div>
+  </div>
 </header>
 
 <main id="main">
-    <div class="sub-header">
+  <div class="sub-header">
     <div class="sub-header-left">
-        <a href="../../index.html" class="btn-back"><i class="bi bi-arrow-left"></i> Volver al inicio</a>
-        <div>
+      <a href="../../index.html" class="btn-back"><i class="bi bi-arrow-left"></i> Volver al inicio</a>
+      <div>
         <h2>Simulación 2D</h2>
         <p>Clasifica los paquetes en la zona correcta de la banda transportadora</p>
-        </div>
+      </div>
     </div>
     <a href="../simulacion3d/simulacion3d.html" class="btn-cyan-ace">Ir a Simulación 3D →</a>
-    </div>
+  </div>
 
-    <div class="page-body">
-
-    <!-- Stats -->
-    <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3">
-        <div class="stat-pill"><div class="val" id="pts">0</div><div class="lbl">Puntos</div></div>
-        </div>
-        <div class="col-6 col-md-3">
-        <div class="stat-pill" style="border-color:#22c55e">
-            <div class="val" style="color:#22c55e" id="prec">100%</div><div class="lbl">Precisión</div>
-        </div>
-        </div>
-        <div class="col-6 col-md-3">
-        <div class="stat-pill" style="border-color:#22c55e">
-            <div class="val" style="color:#22c55e" id="vidas">3 ❤️</div><div class="lbl">Vidas</div>
-        </div>
-        </div>
-        <div class="col-6 col-md-3">
-        <div class="stat-pill" style="border-color:#7c3aed">
-            <div class="val" style="color:#7c3aed" id="nivel">Nivel 1</div><div class="lbl">Dificultad</div>
-        </div>
-        </div>
-    </div>
-
+  <div class="page-body">
     <div class="row g-4">
 
-        <!-- Phaser canvas -->
-        <div class="col-lg-8">
-        <div id="game-container"></div>
-        <div class="d-flex gap-2 mt-3">
-            <button onclick="reiniciarJuego()" class="btn-primary-ace">
-            <i class="bi bi-arrow-clockwise"></i> Reiniciar
-            </button>
-            <button onclick="pausarJuego()" class="btn-cyan-ace" id="btnPausa">
-            <i class="bi bi-pause-fill"></i> Pausar
-            </button>
-            <button onclick="toggleFullscreenGame()" class="btn-cyan-ace" id="btnFullscreen">
-            <i class="bi bi-arrows-fullscreen"></i> Pantalla completa
-            </button>
+      <!-- Canvas + stats pegados arriba -->
+      <div class="col-lg-8">
+        <div id="game-wrapper">
+
+          <!-- Stats pegadas al canvas -->
+          <div class="stats-bar">
+            <div class="stat-pill">
+              <div class="val" id="pts">0</div>
+              <div class="lbl">★ Puntos</div>
+            </div>
+            <div class="stat-pill stat-pill-green">
+              <div class="val val-green" id="prec">100%</div>
+              <div class="lbl">✓ Precisión</div>
+            </div>
+            <div class="stat-pill stat-pill-red">
+              <div class="val val-red" id="vidas">❤ —</div>
+              <div class="lbl">Vidas</div>
+            </div>
+            <div class="stat-pill stat-pill-purple">
+              <div class="val val-purple" id="nivelDisplay">—</div>
+              <div class="lbl">Dificultad</div>
+            </div>
+          </div>
+
+          <!-- Canvas de Phaser -->
+          <div id="game-container"></div>
+
         </div>
+      </div>
+
+      <!-- Panel derecho: historial de partidas -->
+      <div class="col-lg-4">
+
+        <!-- Partida actual en vivo -->
+        <div class="info-card info-card-mb">
+          <div class="fw-bold mb-2 card-title-sm">Partida en curso</div>
+          <div class="d-flex justify-content-between mb-1">
+            <span class="row-label">Puntos</span>
+            <span class="fw-bold" id="livePts">—</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <span class="row-label">Precisión</span>
+            <span class="fw-bold" id="livePrec">—</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <span class="row-label">Vidas</span>
+            <span class="fw-bold" id="liveVidas">—</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="row-label">Nivel</span>
+            <span class="fw-bold" id="liveNivel">—</span>
+          </div>
         </div>
 
-        <!-- Historial -->
-        <div class="col-lg-4">
-        <div style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
-            <div class="fw-bold mb-1">Historial de clasificaciones</div>
-            <div style="font-size:.75rem;color:#888;margin-bottom:12px" id="resumenTexto">Clasifica paquetes para ver el historial</div>
-            <div id="historyList">
-            <div style="color:#bbb;font-size:.82rem;text-align:center;padding:30px 0">
-                Las clasificaciones aparecerán aquí
-            </div>
-            </div>
-        </div>
-
-        <!-- Tabla final (oculta hasta terminar) -->
-        <div id="tablaFinal" style="display:none;background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-top:16px">
-            <div class="fw-bold mb-3" style="color:var(--ace-navy)">Resultado final</div>
-            <div class="d-flex justify-content-between mb-2">
-            <span style="font-size:.85rem">Puntos totales</span>
-            <span class="fw-bold" id="finalPts">0</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-            <span style="font-size:.85rem">Precisión</span>
-            <span class="fw-bold" id="finalPrec">0%</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-            <span style="font-size:.85rem">Nivel alcanzado</span>
-            <span class="fw-bold" id="finalNivel">1</span>
-            </div>
-            <div class="d-flex justify-content-between mb-3">
-            <span style="font-size:.85rem">Calificación</span>
-            <span class="fw-bold" id="finalCalif" style="color:var(--ace-cyan)">—</span>
-            </div>
-            <button onclick="reiniciarJuego()" class="btn-primary-ace w-100 justify-content-center">
-            <i class="bi bi-arrow-clockwise"></i> Jugar de nuevo
+        <!-- Historial de últimas 5 partidas -->
+        <div class="info-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="fw-bold card-title-sm">📋 Historial de partidas</div>
+            <button onclick="limpiarHistorial()" class="btn-clear">
+              Limpiar
             </button>
-        </div>
+          </div>
+          <div id="historialPartidas">
+            <div class="empty-state">
+              Las partidas completadas aparecerán aquí
+            </div>
+          </div>
         </div>
 
+      </div>
     </div>
-    </div>
+  </div>
 </main>
 
-<script src="../../js/bootstrap.bundle.min.js"></script>
-<script src="../../js/main.js"></script>
-<script src="../../js/phaser.min.js"></script>
-<script src="../../js/game.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/main.js"></script>
+<script src="js/phaser.min.js"></script>
+<script src="js/game.js"></script>
 <script>
+// ── Menú hamburguesa ──
 function toggleMenu() {
-    document.getElementById('sidebar').classList.toggle('abierto');
-    document.getElementById('overlay-sidebar').classList.toggle('visible');
+  document.getElementById('sidebar').classList.toggle('abierto');
+  document.getElementById('overlay-sidebar').classList.toggle('visible');
 }
 
-function toggleFullscreenGame() {
-    const container = document.getElementById('game-container');
-    const btn = document.getElementById('btnFullscreen');
-    const icon = btn ? btn.querySelector('i') : null;
+// ── Historial de partidas (máximo 5) ──
+// game.js llama a registrarPartida(datos) al finalizar cada partida
+const MAX_PARTIDAS = 5;
+let historialPartidas = JSON.parse(localStorage.getItem('historialPartidas') || '[]');
 
-    if (!document.fullscreenElement) {
-    if (container.requestFullscreen) {
-        container.requestFullscreen();
-    } else if (container.webkitRequestFullscreen) { // Safari
-        container.webkitRequestFullscreen();
-    } else if (container.msRequestFullscreen) { // IE/Edge antiguo
-        container.msRequestFullscreen();
-    }
-    } else {
-    if (document.exitFullscreen) {
-        document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-    }
-    }
+function registrarPartida(datos) {
+  // datos = { puntos, precision, vidas, nivel, calificacion, fecha }
+  historialPartidas.unshift(datos);
+  if (historialPartidas.length > MAX_PARTIDAS) {
+    historialPartidas = historialPartidas.slice(0, MAX_PARTIDAS);
+  }
+  localStorage.setItem('historialPartidas', JSON.stringify(historialPartidas));
+  renderizarHistorial();
 }
 
-// Actualiza el ícono y texto del botón según el estado real de pantalla completa
-document.addEventListener('fullscreenchange', actualizarBotonFullscreen);
-document.addEventListener('webkitfullscreenchange', actualizarBotonFullscreen);
-document.addEventListener('msfullscreenchange', actualizarBotonFullscreen);
-
-function actualizarBotonFullscreen() {
-    const btn = document.getElementById('btnFullscreen');
-    if (!btn) return;
-    const enFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
-    btn.innerHTML = enFullscreen
-    ? '<i class="bi bi-fullscreen-exit"></i> Salir de pantalla completa'
-    : '<i class="bi bi-arrows-fullscreen"></i> Pantalla completa';
+function limpiarHistorial() {
+  historialPartidas = [];
+  localStorage.removeItem('historialPartidas');
+  renderizarHistorial();
 }
+
+function badgeCalif(c) {
+  if (c === 'Excelente')       return `<span class="badge-exc">${c}</span>`;
+  if (c === 'Muy bueno')       return `<span class="badge-good">${c}</span>`;
+  if (c === 'Bueno')           return `<span class="badge-ok">${c}</span>`;
+  return `<span class="badge-bad">${c}</span>`;
+}
+
+function renderizarHistorial() {
+  const contenedor = document.getElementById('historialPartidas');
+  if (!historialPartidas.length) {
+    contenedor.innerHTML = '<div class="empty-state">Las partidas completadas aparecerán aquí</div>';
+    return;
+  }
+
+  contenedor.innerHTML = historialPartidas.map((p, i) => `
+    <div class="partida-row">
+      <div class="partida-num">${i + 1}</div>
+      <div>
+        <div class="partida-nivel">${p.nivel}</div>
+        <div class="partida-fecha">${p.fecha}</div>
+      </div>
+      <div class="partida-stat">
+        <div class="num">${p.puntos}</div>
+        <div class="sublabel">pts</div>
+      </div>
+      <div class="partida-stat">
+        <div class="num">${p.precision}%</div>
+        <div class="sublabel">prec.</div>
+      </div>
+      <div class="partida-stat">
+        ${badgeCalif(p.calificacion)}
+        <div class="partida-vidas-sub">❤ ${p.vidas}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Actualizar stats en vivo desde game.js
+// game.js llama a actualizarStatsHTML(pts, prec, vidas, nivel)
+function actualizarStatsHTML(pts, prec, vidas, nivel) {
+  document.getElementById('pts').textContent         = pts;
+  document.getElementById('prec').textContent        = prec + '%';
+  document.getElementById('vidas').textContent       = '❤ ' + vidas;
+  document.getElementById('nivelDisplay').textContent = 'Nv.' + nivel;
+
+  document.getElementById('livePts').textContent   = pts;
+  document.getElementById('livePrec').textContent  = prec + '%';
+  document.getElementById('liveVidas').textContent = vidas;
+  document.getElementById('liveNivel').textContent = 'Nivel ' + nivel;
+}
+
+// Render inicial del historial guardado
+renderizarHistorial();
 </script>
 </body>
 </html>
