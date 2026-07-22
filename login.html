@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ACE Logístico – Acceso</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<main id="main" style="margin-left:0;min-height:100vh;display:flex;align-items:center;justify-content:center;">
+  <div class="page-body" style="width:100%;max-width:480px;padding:24px;">
+
+    <!-- Logo / encabezado, mismo estilo que el topbar-title de index.html -->
+    <div class="text-center mb-4">
+      <img src="images/logoace1.jpeg" alt="ACE Logístico" style="height:52px;margin-bottom:12px;border-radius:10px"/>
+      <div class="topbar-title">Entrenamiento de Operarios de Almacén</div>
+      <div class="topbar-sub">Sistema de capacitación interactiva ACE Logístico</div>
+    </div>
+
+    <!-- Banner delgado, mismo componente banner-blue de index.html -->
+    <div class="banner-blue mb-4" style="padding:16px 20px;">
+      <div class="banner-content" style="max-width:100%;">
+        <span class="banner-tag">Acceso a OmniTrain</span>
+        <p class="mb-0 mt-2" style="font-size:.85rem;opacity:.9">
+          Inicia sesión para continuar tu entrenamiento y ver tu progreso.
+        </p>
+      </div>
+    </div>
+
+    <!-- Formulario dentro de una welcome-card, igual que las tarjetas de index.html -->
+    <div class="welcome-card">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="avatar-circle"><i class="bi bi-person-fill" style="font-size:1.4rem"></i></div>
+        <div>
+          <div class="fw-bold">Acceso a rutas de capacitación</div>
+          <span class="badge-level">Ingreso seguro</span>
+        </div>
+      </div>
+
+      <form id="loginForm" novalidate>
+
+        <!-- Perfil de acceso -->
+        <div class="mb-3">
+          <label for="role" class="form-label">Perfil de acceso</label>
+          <select id="role" name="role" class="form-select" required>
+            <option value="" selected disabled>Selecciona una opción</option>
+            <option value="coordinador">
+              Coordinador de capacitación (asigna módulos y tareas)
+            </option>
+            <option value="colaborador">
+              Colaborador en capacitación (realiza módulos asignados)
+            </option>
+          </select>
+          <div class="invalid-feedback">
+            Debes seleccionar un perfil para continuar.
+          </div>
+        </div>
+
+        <!-- Correo corporativo -->
+        <div class="mb-3">
+          <label for="email" class="form-label">Correo corporativo</label>
+          <input type="email" id="email" name="email" class="form-control"
+            placeholder="nombre.apellido@empresa.com" required />
+          <div class="invalid-feedback">
+            Ingresa un correo corporativo válido.
+          </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña</label>
+          <input type="password" id="password" name="password" class="form-control" minlength="6"
+            required />
+          <div class="invalid-feedback">
+            La contraseña debe tener al menos 6 caracteres.
+          </div>
+        </div>
+
+        <!-- Mensajes de estado -->
+        <div class="mb-3">
+          <div id="loginFeedback" class="small text-muted">
+            Ingresa tus datos para acceder a OmniTrain según tu perfil.
+          </div>
+        </div>
+
+        <!-- Botón de envío: mismo estilo que btn-continue de index.html -->
+        <button type="submit" class="btn-continue w-100 justify-content-center" id="loginButton" style="border:none">
+          Acceder a OmniTrain <i class="bi bi-chevron-right"></i>
+        </button>
+
+        <div class="text-center mt-3">
+          <a href="index.html" class="text-muted small text-decoration-none">
+            <i class="bi bi-arrow-left"></i> Volver al inicio
+          </a>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</main>
+
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>
