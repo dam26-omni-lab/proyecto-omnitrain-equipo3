@@ -4,6 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ACE Logístico – Inicio</title>
+  <script>
+    // Si no hay sesión activa (no ha iniciado sesión en login.html),
+    // redirige inmediatamente a login.html antes de mostrar el dashboard.
+    if (!sessionStorage.getItem('ace_user_email')) {
+      window.location.replace('login.html');
+    }
+  </script>
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/bootstrap-icons.min.css">
   <link rel="stylesheet" href="css/styles.css">
@@ -65,6 +72,7 @@
     </nav>
 
     <!-- Welcome card -->
+
     <div class="welcome-card mb-4">
       <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
         <div class="flex-grow-1">
@@ -176,6 +184,8 @@
     </div>
 
   </div>
+
+  
 </main>
 
 <script src="js/bootstrap.bundle.min.js"></script>
